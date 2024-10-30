@@ -1,19 +1,18 @@
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
-import SignUp from "./pages/SignUp";
-import SignIn from "./pages/SignIn"
-import Blogs from "../components/Blogs";
-import CreateBlog from "../components/CreateBlog";
+import Authform from "./pages/Authform";
+import Navbar from "./components/Navbar";
+import Home from "./components/Home";
 
 function App() {
   return (
-    <div className="h-screen flex items-center justify-center">
+    <div>
       <Routes>
-        <Route path="/" element={<Blogs/>}></Route>
-        <Route path="/signup" element={<SignUp/>}></Route>
-        <Route path="/signin" element={<SignIn/>}></Route>
-        <Route path="/create-blog" element={<CreateBlog/>}></Route>
-        <Route path="*" element={<h1>Kya kr rha hai bhai??</h1>}></Route>
+        <Route path="/" element={<Navbar />}>
+          <Route path="/" element={<Home />}></Route>
+          <Route path="/signup" element={<Authform type={"signup"} />}></Route>
+          <Route path="/signin" element={<Authform type={"signin"} />}></Route>
+        </Route>
       </Routes>
     </div>
   );

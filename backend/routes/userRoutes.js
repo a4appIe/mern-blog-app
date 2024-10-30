@@ -11,7 +11,7 @@ const {
 
 router.post("/signup", createUser);
 
-router.post("/login", loginUser)
+router.post("/signin", loginUser)
 
 router.get("/users", getUsers);
 

@@ -14,7 +14,7 @@ const createUser = async (req, res) => {
     const user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({
-        message: "User already exist.",
+        message: "Email already exist.",
         success: false,
       });
     }
@@ -28,12 +28,10 @@ const createUser = async (req, res) => {
     return res.status(200).json({
       message: "User created successfully",
       success: true,
+      token,
       user: {
         name: newUser.name,
-        email: newUser.email,
-        blogs: newUser.blogs,
-        id: newUser._id,
-        token,
+        email: newUser.email
       },
     });
   } catch (err) {
@@ -55,22 +53,30 @@ const loginUser = async (req, res) => {
     }
     const user = await User.findOne({ email }).populate();
     if (!user) {
-      return res.status(400).json({
+      return res.status(500).json({
         message: "User not found",
         success: false,
       });
     }
+    let token = await generateJWT({
+      email: user.email,
+      id: user._id,
+    });
     const pass = await bcrypt.compare(password, user.password);
     if (!pass) {
-      return res.status(200).json({
+      return res.status(400).json({
         message: "Incorrect password",
-        success: true,
+        success: false,
       });
     }
     return res.status(200).json({
       message: "User login successfully",
       success: true,
-      user,
+      token,
+      user: {
+        name: user.name,
+        email: user.email,
+      },
     });
   } catch (err) {
     return res.status(500).json({
