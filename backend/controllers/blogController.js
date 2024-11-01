@@ -66,13 +66,18 @@ const getBlog = async (req, res) => {
 const getSingleBlog = async (req, res) => {
   try {
     const { id } = req.params;
-    const blog = await Blog.findById(id).populate({
-      path: "comments",
-      populate: {
-        path: "user",
-        select: "name email",
-      },
-    });
+    const blog = await Blog.findById(id)
+      .populate({
+        path: "creator",
+        select: "name email"
+      })
+      .populate({
+        path: "comments",
+        populate: {
+          path: "user",
+          select: "name email",
+        },
+      });
     if (!blog || blog.draft == true) {
       return res.status(200).json({
         success: true,

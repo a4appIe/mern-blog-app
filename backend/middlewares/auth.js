@@ -1,8 +1,8 @@
 const { verifyJWT } = require("../utils/generateToken");
 
 const verifyUser = async (req, res, next) => {
-  const token = req.headers.authorization.split(" ")[1];
   try {
+    const token = req.headers.authorization.split(" ")[1];
     if (!token) {
       res.status(400).json({
         success: false,

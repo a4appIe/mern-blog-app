@@ -7,7 +7,6 @@ const Home = () => {
   const fetchBlogs = async () => {
     const res = await axios.get("http://localhost:3000/api/v1/blogs");
     setUserData(res.data.blogs);
-    console.log(res.data.blogs);
   };
   useEffect(() => {
     fetchBlogs();
@@ -16,7 +15,7 @@ const Home = () => {
   return (
     <div className="w-[70%] flex flex-col gap-4 m-auto p-4 mt-10">
       {userData.map((blog) => (
-        <Link to={"/blog/:id"}>
+        <Link to={`/blog/${blog.title.toLowerCase().split(" ").join("-")}-${blog._id}`} key={blog._id}>
           <div className="flex bg-green-200 items-center justify-between border border-black px-5 py-2">
             <div className="w-[70%] h-full flex flex-col gap-4">
               <p>{blog.creator.name}</p>

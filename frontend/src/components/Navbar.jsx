@@ -14,12 +14,12 @@ const Navbar = () => {
           <li className="list-none flex items-center">Contact</li>
           <div className="flex items-center gap-6 h-full">
             <Link to={"/signin"}>
-              <button className="outline outline-blue-500 text-blue-500 px-5 py-2 rounded">
+              <button className="outline outline-green-500 text-green-500 px-5 py-2 rounded hover:text-green-600 hover:outline-green-600">
                 Login
               </button>
             </Link>
             <Link to={"/signup"}>
-              <button className="bg-blue-500 text-white px-5 py-2 rounded">
+              <button className="bg-green-300 outline-black outline text-black px-5 py-2 rounded hover:bg-green-400">
                 Sign up
               </button>
             </Link>
