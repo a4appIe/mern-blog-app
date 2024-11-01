@@ -4,10 +4,12 @@ import { Link, Outlet } from "react-router-dom";
 const Navbar = () => {
   return (
     <>
-      <nav className="max-sm:h-20 h-24 bg-red-300 flex items-center justify-between px-5">
+      <nav className="max-sm:h-20 h-24 flex items-center justify-between px-40">
         <div className="h-20 w-20 bg-red-700"></div>
         <div className="flex gap-10">
-          <li className="list-none flex items-center">Home</li>
+          <li className="list-none flex items-center">
+            <Link to={"/"}>Home</Link>
+          </li>
           <li className="list-none flex items-center">About</li>
           <li className="list-none flex items-center">Contact</li>
           <div className="flex items-center gap-6 h-full">
@@ -24,7 +26,7 @@ const Navbar = () => {
           </div>
         </div>
       </nav>
-      <Outlet/>
+      <Outlet />
     </>
   );
 };
