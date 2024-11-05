@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 const Home = () => {
   const [userData, setUserData] = useState([]);
   const fetchBlogs = async () => {
-    const res = await axios.get("http://localhost:3000/api/v1/blogs");
+    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/blogs`);
     setUserData(res.data.blogs);
   };
   useEffect(() => {

@@ -1,13 +1,14 @@
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 const generateJWT = async (payload) => {
-  let token = await jwt.sign(payload, "abcdefghij");
+  let token = await jwt.sign(payload, process.env.JWT_SECRET);
   return token;
 };
 
 const verifyJWT = async (token) => {
   try {
-    let data = await jwt.verify(token, "abcdefghij");
+    let data = await jwt.verify(token, process.env.JWT_SECRET);
     return data;
   } catch (error) {
     return false;
