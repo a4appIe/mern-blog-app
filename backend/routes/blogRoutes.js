@@ -16,9 +16,9 @@ router.post("/blogs", verifyUser, upload.single("image"), createBlog);
 
 router.get("/blogs", getBlog);
 
-router.get("/blogs/:id", getSingleBlog);
+router.get("/blogs/:blogId", getSingleBlog);
 
-router.patch("/blogs/:id", verifyUser, updateBlog);
+router.patch("/blogs/:id", verifyUser, upload.single("image"), updateBlog);
 
 router.delete("/blogs/:id", verifyUser, deleteBlog);
 

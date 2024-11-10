@@ -1,21 +1,21 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 const BlogPage = () => {
-  const param = useParams();
-  const id = param.id.split("-").at(-1);
+  const {blogId} = useParams();
+  const user = JSON.parse(localStorage.getItem(user))
   const [blogData, setBlogData] = useState(null);
   const fetchBlogById = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/blogs/${id}`
+        `${import.meta.env.VITE_BACKEND_URL}/blogs/${blogId}`
       );
       setBlogData(res.data.blog);
       console.log(res.data.blog);
     } catch (error) {
-      toast.error(error);
+      toast.error(error.response.data.message);
     }
   };
   useEffect(() => {
@@ -26,7 +26,9 @@ const BlogPage = () => {
       <h1 className="text-4xl font-bold text-gray-700">{blogData.title}</h1>
       <p className="text-gray-600">{blogData.creator.name}</p>
       <img src={blogData.image} alt="" className="w-full h-[600px] object-cover mt-5" />
-      <button className="bg-green-300 px-5 py-2 rounded hover:bg-green-400">Edit</button>
+      {
+      user.email === blogData.creator.email && <Link to={"/edit/"+blogData.blogId}><button className="bg-green-300 px-5 py-2 rounded hover:bg-green-400 mt-4">Edit</button></Link>
+      }
     </div>
   </div> : <h1>Loading...</h1>}</div>;
 };

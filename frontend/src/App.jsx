@@ -15,7 +15,7 @@ function App() {
           <Route path="/signup" element={<Authform type={"signup"} />}></Route>
           <Route path="/signin" element={<Authform type={"signin"} />}></Route>
           <Route path="/add-blog" element={<AddBlog />}></Route>
-          <Route path="/blog/:id" element={<BlogPage />}></Route>
+          <Route path="/blog/:blogId" element={<BlogPage />}></Route>
           <Route path="/edit/:id" element={<AddBlog />}></Route>
         </Route>
       </Routes>

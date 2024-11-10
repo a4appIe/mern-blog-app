@@ -2,6 +2,8 @@ const Blog = require("../models/blogSchema");
 const User = require("../models/userSchema");
 const { uploadImage, deleteImage } = require("../utils/uploadImage");
 const fs = require("fs");
+const ShortUniqueId = require("short-unique-id");
+const { randomUUID } = new ShortUniqueId({ length: 15 });
 
 const createBlog = async (req, res) => {
   try {
@@ -24,6 +26,7 @@ const createBlog = async (req, res) => {
     const { secure_url, public_id } = await uploadImage(image.path);
     fs.unlinkSync(image.path);
 
+    const blogId = `${title.toLowerCase().replaceAll(" ", "-")}-${randomUUID()}`;
     const blog = await Blog.create({
       title,
       description,
@@ -31,6 +34,7 @@ const createBlog = async (req, res) => {
       creator,
       image: secure_url,
       imageId: public_id,
+      blogId,
     });
     await User.findByIdAndUpdate(creator, { $push: { blogs: blog._id } });
     return res.status(200).json({
@@ -65,22 +69,25 @@ const getBlog = async (req, res) => {
 };
 const getSingleBlog = async (req, res) => {
   try {
-    const { id } = req.params;
-    const blog = await Blog.findById(id)
-      .populate({
-        path: "creator",
-        select: "name email"
-      })
+    const { blogId } = req.params;
+    console.log(blogId)
+    const blog = await Blog.findOne({ blogId })
       .populate({
         path: "comments",
         populate: {
           path: "user",
           select: "name email",
         },
+      })
+      .populate({
+        path: "creator",
+        select: "name email",
       });
-    if (!blog || blog.draft == true) {
-      return res.status(200).json({
-        success: true,
+    console.log(blog);
+    if (!blog) {
+      console.log("not found");
+      return res.status(404).json({
+        success: false,
         message: "Blog not found",
       });
     }
@@ -90,6 +97,7 @@ const getSingleBlog = async (req, res) => {
       blog,
     });
   } catch (error) {
+    // console.log(error)
     return res.status(500).json({
       success: false,
       message: error.message,
@@ -101,7 +109,7 @@ const updateBlog = async (req, res) => {
     const creator = req.user;
     const { id } = req.params;
     const { title, description, draft } = req.body;
-    const blog = await Blog.findById(id);
+    const blog = await Blog.findOne({blogId: id});
     if (!blog) {
       return res.status(500).json({
         success: false,
@@ -114,15 +122,15 @@ const updateBlog = async (req, res) => {
         message: "You are not authorized",
       });
     }
-    // const updatedBlog = await Blog.updateOne(
-    //   { _id: id },
-    //   {
-    //     title,
-    //     description,
-    //     draft,
-    //   },
-    //   { new: true }
-    // );
+
+    if(image){
+      await deleteImage(blog.imageId)
+      const { secure_url, public_id } = await uploadImage(image.path);
+      blog.image = secure_url;
+      blog.imageId = public_id;
+      fs.unlinkSync(image.path);
+    }
+
     blog.title = title || blog.title;
     blog.description = description || blog.description;
     blog.draft = draft || blog.draft;
