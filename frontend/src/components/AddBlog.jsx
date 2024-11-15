@@ -2,10 +2,13 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 
 const AddBlog = () => {
+  const dispatch = useDispatch();
   const { id } = useParams();
-  const token = JSON.parse(localStorage.getItem("token"));
+  const { token } = useSelector((slice) => slice.user);
+  const {title, description, image} = useSelector(slice => slice.selectedBlog);
   const navigate = useNavigate();
   const [blogData, setBlogData] = useState({
     title: "",
@@ -53,26 +56,25 @@ const AddBlog = () => {
   };
 
   const fetchBlogById = async () => {
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/blogs/${id}`
-      );
+    // try {
+    //   const res = await axios.get(
+    //     `${import.meta.env.VITE_BACKEND_URL}/blogs/${id}`
+    //   );
       setBlogData({
-        title: res.data.blog.title,
-        description: res.data.blog.description,
-        image: res.data.blog.image,
+        title: title,
+        description: description,
+        image: image,
       });
-      console.log(res);
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
+    //   console.log(res);
+    // } catch (error) {
+    //   toast.error(error.response.data.message);
+    // }
   };
   useEffect(() => {
     if (id) {
       fetchBlogById();
     }
   }, []);
-
 
   useEffect(() => {
     if (!token) {
@@ -123,7 +125,9 @@ const AddBlog = () => {
               <div className="aspect-video h-80 w-full bg-green-300 rounded overflow-hidden flex items-center justify-center">
                 <img
                   src={
-                    typeof(blogData.image) == "string" ? blogData.image : URL.createObjectURL(blogData.image)
+                    typeof blogData.image == "string"
+                      ? blogData.image
+                      : URL.createObjectURL(blogData.image)
                   }
                   alt={blogData.image}
                   className="h-full w-full object-cover object-center"

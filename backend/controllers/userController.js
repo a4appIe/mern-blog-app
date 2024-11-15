@@ -28,10 +28,10 @@ const createUser = async (req, res) => {
     return res.status(200).json({
       message: "User created successfully",
       success: true,
-      token,
       user: {
         name: newUser.name,
-        email: newUser.email
+        email: newUser.email,
+        token,
       },
     });
   } catch (err) {
@@ -72,10 +72,10 @@ const loginUser = async (req, res) => {
     return res.status(200).json({
       message: "User login successfully",
       success: true,
-      token,
       user: {
         name: user.name,
         email: user.email,
+        token,
       },
     });
   } catch (err) {

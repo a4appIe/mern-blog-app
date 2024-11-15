@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { login } from "../utils/userSlice";
 
 const Authform = ({ type }) => {
   const [userData, setUserData] = useState({
@@ -9,6 +11,8 @@ const Authform = ({ type }) => {
     email: "",
     password: "",
   });
+
+  const dispatch = useDispatch();
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
@@ -16,8 +20,12 @@ const Authform = ({ type }) => {
         `${import.meta.env.VITE_BACKEND_URL}/${type}`,
         userData
       );
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      localStorage.setItem("token", JSON.stringify(res.data.token));
+      console.log(res);
+
+      // // localStorage.setItem("user", JSON.stringify(res.data.user));   ----   // IMPLEMENTED REDUX!!
+      // // localStorage.setItem("token", JSON.stringify(res.data.token));
+      console.log(res.data.user);
+      dispatch(login(res.data.user));
       toast.success(res.data.message);
     } catch (error) {
       toast.error(error.response.data.message);
