@@ -26,7 +26,7 @@ const createBlog = async (req, res) => {
     const { secure_url, public_id } = await uploadImage(image.path);
     fs.unlinkSync(image.path);
 
-    const blogId = `${title.toLowerCase().replaceAll(" ", "-")}-${randomUUID()}`;
+    const blogId = `${title.toLowerCase().split(/[^a-zA-Z0-9]+/).join("-")}-${randomUUID()}`; 
     const blog = await Blog.create({
       title,
       description,
@@ -195,12 +195,14 @@ const likeBlog = async (req, res) => {
       res.status(200).json({
         success: true,
         message: "Blog liked successfully",
+        isLiked: true,
       });
     } else {
       await Blog.updateOne({ _id: id }, { $pull: { likes: creator } });
       res.status(200).json({
         success: true,
         message: "Blog disliked successfully",
+        isLiked: false,
       });
     }
   } catch (error) {

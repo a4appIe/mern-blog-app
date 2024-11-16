@@ -12,9 +12,16 @@ const selectedBlogSlice = createSlice({
       localStorage.removeItem("selectedBlog");
       return {};
     },
+    changeLikes(state, action) {
+      if (state.likes.includes(action.payload)) {
+        state.likes = state.likes.filter((like) => like !== action.payload);
+      } else {
+        state.likes = [...state.likes, action.payload];
+      }
+    },
   },
 });
 
-export const { addSelectedBlog, removeSelectedBlog } =
+export const { addSelectedBlog, removeSelectedBlog, changeLikes } =
   selectedBlogSlice.actions;
 export default selectedBlogSlice.reducer;

@@ -22,7 +22,7 @@ router.patch("/blogs/:id", verifyUser, upload.single("image"), updateBlog);
 
 router.delete("/blogs/:id", verifyUser, deleteBlog);
 
-router.patch("/blogs/like/:id", verifyUser, likeBlog);
+router.post("/blogs/like/:id", verifyUser, likeBlog);
 
 router.post("/blogs/comment/:id", verifyUser, postComment);
 

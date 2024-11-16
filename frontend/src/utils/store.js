@@ -5,7 +5,7 @@ import selectedBlog from "./selectedBlogSlice"
 const store = configureStore({
   reducer: {
     user: userSlice,
-    selectedBlog,
+    selectedBlog: selectedBlog,
   },
 });
 

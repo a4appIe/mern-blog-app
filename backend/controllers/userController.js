@@ -29,6 +29,7 @@ const createUser = async (req, res) => {
       message: "User created successfully",
       success: true,
       user: {
+        id: newUser._id,
         name: newUser.name,
         email: newUser.email,
         token,
@@ -73,6 +74,7 @@ const loginUser = async (req, res) => {
       message: "User login successfully",
       success: true,
       user: {
+        id: user._id,
         name: user.name,
         email: user.email,
         token,
