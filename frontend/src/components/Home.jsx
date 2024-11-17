@@ -13,7 +13,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="w-[70%] flex flex-col gap-4 m-auto p-4 mt-10">
+    <div className="w-[50%] flex flex-col gap-4 m-auto p-4 mt-10">
       {userData.map((blog) => (
         <Link to={`/blog/${blog.blogId}`} key={blog._id}>
           <div className="flex bg-green-200 items-center justify-between border border-black px-5 py-2">

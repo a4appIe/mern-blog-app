@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import { useDispatch } from "react-redux";
@@ -13,6 +13,7 @@ const Authform = ({ type }) => {
   });
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
@@ -26,6 +27,7 @@ const Authform = ({ type }) => {
       // // localStorage.setItem("token", JSON.stringify(res.data.token));
       console.log(res.data.user);
       dispatch(login(res.data.user));
+      navigate("/");
       toast.success(res.data.message);
     } catch (error) {
       toast.error(error.response.data.message);
