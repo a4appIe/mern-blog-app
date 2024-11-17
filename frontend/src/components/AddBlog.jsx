@@ -5,6 +5,14 @@ import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
+import NestedList from '@editorjs/nested-list';
+import CodeTool from '@editorjs/code';
+import Marker from '@editorjs/marker';
+import Underline from '@editorjs/underline';
+import Embed from '@editorjs/embed';
+
+
+
 
 const AddBlog = () => {
   const editorjsRef = useRef(null);
@@ -37,6 +45,15 @@ const AddBlog = () => {
             defaultLevel: 3,
           },
         },
+        List: {
+          class: NestedList,
+          inlineToolbar: true,
+        },
+        CodeTool: CodeTool,
+        Marker: Marker,
+        Underline: Underline,
+        Embed, Embed,
+
       },
       onChange: async () => {
         let data = await editorjsRef.current.save();
