@@ -9,7 +9,7 @@ const createBlog = async (req, res) => {
   try {
     const creator = req.user;
     const image = req.file;
-    const { title, description, draft } = req.body;
+    const { title, description, draft, content } = req.body;
     if (!title || !description) {
       return res.status(400).json({
         success: false,
@@ -35,6 +35,7 @@ const createBlog = async (req, res) => {
       image: secure_url,
       imageId: public_id,
       blogId,
+      content,
     });
     await User.findByIdAndUpdate(creator, { $push: { blogs: blog._id } });
     return res.status(200).json({

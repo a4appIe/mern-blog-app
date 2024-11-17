@@ -1,12 +1,13 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
-import EditorJS from '@editorjs/editorjs';
+import EditorJS from "@editorjs/editorjs";
+import Header from "@editorjs/header";
 
 const AddBlog = () => {
-  const editorjs = new EditorJS();
+  const editorjsRef = useRef(null);
   const dispatch = useDispatch();
   const { id } = useParams();
   const { token } = useSelector((slice) => slice.user);
@@ -18,7 +19,32 @@ const AddBlog = () => {
     title: "",
     description: "",
     image: null,
+    content: "",
   });
+
+  const initializeEditorJS = () => {
+    console.log("Initializing EditorJS...");
+    editorjsRef.current = new EditorJS({
+      holder: "editor",
+      placeholder: "write something...",
+      tools: {
+        header: {
+          class: Header,
+          inlineToolbar: true,
+          config: {
+            placeholder: "Enter a header",
+            levels: [2, 3, 4],
+            defaultLevel: 3,
+          },
+        },
+      },
+      onChange: async () => {
+        let data = await editorjsRef.current.save();
+        setBlogData((blogData) => ({ ...blogData, content: data }));
+      },
+    });
+  };
+
   const handleUpdateBlog = async (e) => {
     e.preventDefault();
     try {
@@ -41,6 +67,7 @@ const AddBlog = () => {
 
   const handlePostBlog = async (e) => {
     e.preventDefault();
+    console.log(blogData);
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/blogs`,
@@ -75,6 +102,12 @@ const AddBlog = () => {
   useEffect(() => {
     if (!token) {
       return navigate("/signin");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (editorjsRef.current === null) {
+      initializeEditorJS();
     }
   }, []);
 
@@ -147,10 +180,7 @@ const AddBlog = () => {
           />
         </div>
 
-        <div id="editorjs"></div>
-
-
-
+        <div id="editor"></div>
 
         <button className="bg-green-300  hover:bg-green-400 border border-black rounded w-fit px-5 py-2">
           {id ? "Update Blog" : "Post blog"}
