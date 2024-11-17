@@ -10,7 +10,7 @@ const createBlog = async (req, res) => {
     const creator = req.user;
     const image = req.file;
     const { title, description, draft, content } = req.body;
-    if (!title || !description) {
+    if (!title || !description || !content) {
       return res.status(400).json({
         success: false,
         message: "Please fill all the fields",
