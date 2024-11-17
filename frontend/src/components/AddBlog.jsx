@@ -3,12 +3,16 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
+import EditorJS from '@editorjs/editorjs';
 
 const AddBlog = () => {
+  const editorjs = new EditorJS();
   const dispatch = useDispatch();
   const { id } = useParams();
   const { token } = useSelector((slice) => slice.user);
-  const {title, description, image} = useSelector(slice => slice.selectedBlog);
+  const { title, description, image } = useSelector(
+    (slice) => slice.selectedBlog
+  );
   const navigate = useNavigate();
   const [blogData, setBlogData] = useState({
     title: "",
@@ -56,19 +60,11 @@ const AddBlog = () => {
   };
 
   const fetchBlogById = async () => {
-    // try {
-    //   const res = await axios.get(
-    //     `${import.meta.env.VITE_BACKEND_URL}/blogs/${id}`
-    //   );
-      setBlogData({
-        title: title,
-        description: description,
-        image: image,
-      });
-    //   console.log(res);
-    // } catch (error) {
-    //   toast.error(error.response.data.message);
-    // }
+    setBlogData({
+      title: title,
+      description: description,
+      image: image,
+    });
   };
   useEffect(() => {
     if (id) {
@@ -150,6 +146,12 @@ const AddBlog = () => {
             }}
           />
         </div>
+
+        <div id="editorjs"></div>
+
+
+
+
         <button className="bg-green-300  hover:bg-green-400 border border-black rounded w-fit px-5 py-2">
           {id ? "Update Blog" : "Post blog"}
         </button>

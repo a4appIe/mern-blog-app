@@ -37,7 +37,11 @@ const Navbar = () => {
             </div>
           </Link>
           {token ? (
-            <p>{name}</p>
+            <img
+              src={`https://api.dicebear.com/9.x/initials/svg?seed=${name}`}
+              alt=""
+              className="h-10 rounded-lg cursor-pointer"
+            />
           ) : (
             <div className="flex gap-3">
               <Link to={"/signup"}>
