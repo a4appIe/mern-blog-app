@@ -18,11 +18,19 @@ const postComment = async (req, res) => {
       comment,
       blog: blog,
       user: creator,
-    });
+    }).then((comment) =>
+      comment.populate({
+        path: "user",
+        select: "name email",
+      })
+    );
+    console.log(newComment);
+
     await Blog.updateOne({ _id: id }, { $push: { comments: newComment._id } });
     res.status(200).json({
       success: true,
       message: "Comment added successfully",
+      newComment,
     });
   } catch (error) {
     return res.status(500).json({
@@ -115,41 +123,41 @@ const editComment = async (req, res) => {
   }
 };
 const likeComment = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const userId = req.user;
-      const comment = await Comment.findById(id);
-      if (!comment) {
-        return res.status(500).json({
-          success: false,
-          message: "Comment not found",
-        });
-      } 
-      console.log(comment.likes);
-      if (!comment.likes.includes(userId)) {
-        await Comment.updateOne({ _id: id }, { $push: { likes: userId } });
-        res.status(200).json({
-          success: true,
-          message: "Comment liked successfully",
-        });
-      } else {
-        await Comment.updateOne({ _id: id }, { $pull: { likes: userId } });
-        res.status(200).json({
-          success: true,
-          message: "Comment disliked successfully",
-        });
-      }
-    } catch (error) {
+  try {
+    const { id } = req.params;
+    const userId = req.user;
+    const comment = await Comment.findById(id);
+    if (!comment) {
       return res.status(500).json({
         success: false,
-        message: error.message,
+        message: "Comment not found",
       });
     }
-  };
+    console.log(comment.likes);
+    if (!comment.likes.includes(userId)) {
+      await Comment.updateOne({ _id: id }, { $push: { likes: userId } });
+      res.status(200).json({
+        success: true,
+        message: "Comment liked successfully",
+      });
+    } else {
+      await Comment.updateOne({ _id: id }, { $pull: { likes: userId } });
+      res.status(200).json({
+        success: true,
+        message: "Comment disliked successfully",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {
   postComment,
   deleteComment,
   editComment,
-  likeComment
+  likeComment,
 };

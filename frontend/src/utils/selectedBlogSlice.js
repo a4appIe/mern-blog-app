@@ -19,9 +19,12 @@ const selectedBlogSlice = createSlice({
         state.likes = [...state.likes, action.payload];
       }
     },
+    setComments(state, action){
+      state.comments = [...state.comments, action.payload];
+    }
   },
 });
 
-export const { addSelectedBlog, removeSelectedBlog, changeLikes } =
+export const { addSelectedBlog, removeSelectedBlog, changeLikes, setComments } =
   selectedBlogSlice.actions;
 export default selectedBlogSlice.reducer;
