@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import formatDate from "../utils/formatDate";
 
 const Home = () => {
   const [userData, setUserData] = useState([]);
@@ -23,10 +24,19 @@ const Home = () => {
                 <h2 className="text-2xl font-bold">{blog.title}</h2>
                 <p className="line-clamp-2">{blog.description}</p>
               </div>
-              <div className="flex gap-10">
-                <p>{blog.createdAt}</p>
-                <p>{blog.likes.length}</p>
-                <p>{blog.comments.length}</p>
+              <div className="flex gap-10 items-center">
+                <p>{formatDate(blog.createdAt)}</p>
+                <div className="flex gap-8">
+                  <div className="w-fit cursor-pointer flex gap-2 items-center justify-center">
+                    <i className="fi fi-rr-social-network text-lg mt-1"></i>
+                    <p className="text-lg">{blog.likes.length}</p>
+                  </div>
+
+                  <div className="w-fit cursor-pointer flex gap-2 items-center justify-center">
+                    <i className="fi fi-sr-comments text-lg mt-1"></i>
+                    <p className="text-lg">{blog.comments.length}</p>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="w-[160px] h-[100px] overflow-hidden">

@@ -84,21 +84,21 @@ const BlogPage = () => {
                 </button>
               </Link>
             )}
-            <div className="flex gap-8 mt-5">
+            <div className="flex gap-8 mt-5 items-center">
               <div
                 onClick={handleLike}
-                className="w-fit cursor-pointer flex gap-3"
+                className="w-fit cursor-pointer flex gap-3 items-center"
               >
                 {isLiked ? (
-                  <i className="fi fi-sr-thumbs-up text-3xl"></i>
+                  <i className="fi fi-sr-thumbs-up text-3xl mt-1"></i>
                 ) : (
-                  <i className="fi fi-rr-social-network text-3xl"></i>
+                  <i className="fi fi-rr-social-network text-3xl mt-1"></i>
                 )}
                 <p className="text-2xl">{likes.length}</p>
               </div>
 
-              <div className="w-fit cursor-pointer flex gap-3">
-                <i className="fi fi-rr-comment-dots text-3xl"></i>
+              <div className="w-fit cursor-pointer flex gap-3 items-center">
+                <i class="fi fi-sr-comments text-2xl"></i>
                 <p className="text-2xl">{blogData.comments.length}</p>
               </div>
             </div>
