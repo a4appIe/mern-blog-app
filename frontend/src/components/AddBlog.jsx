@@ -52,7 +52,7 @@ const AddBlog = () => {
         CodeTool: CodeTool,
         Marker: Marker,
         Underline: Underline,
-        Embed, Embed,
+        Embed: Embed,
 
       },
       onChange: async () => {
