@@ -26,7 +26,7 @@ const createBlog = async (req, res) => {
     const { secure_url, public_id } = await uploadImage(image.path);
     fs.unlinkSync(image.path);
 
-    const blogId = `${title.toLowerCase().split(/[^a-zA-Z0-9]+/).join("-")}-${randomUUID()}`; 
+    const blogId = `${title.toLowerCase().split(/[^a-zA-Z0-9]+/).join("-")}${randomUUID()}`; 
     const blog = await Blog.create({
       title,
       description,

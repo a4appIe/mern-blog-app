@@ -41,6 +41,9 @@ const BlogPage = () => {
   };
 
   const handleLike = async () => {
+    if(!token){
+      return navigate("/signin");
+    }
     if (token) {
       setIsLiked((prev) => !prev);
       let res = await axios.post(
