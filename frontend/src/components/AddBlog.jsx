@@ -5,18 +5,17 @@ import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
-import NestedList from '@editorjs/nested-list';
-import CodeTool from '@editorjs/code';
-import Marker from '@editorjs/marker';
-import Underline from '@editorjs/underline';
-import Embed from '@editorjs/embed';
-
-
-
+import NestedList from "@editorjs/nested-list";
+import CodeTool from "@editorjs/code";
+import Marker from "@editorjs/marker";
+import Underline from "@editorjs/underline";
+import Embed from "@editorjs/embed";
+import ImageTool from "@editorjs/image";
 
 const AddBlog = () => {
   const editorjsRef = useRef(null);
   const dispatch = useDispatch();
+  const formData = new FormData();
   const { id } = useParams();
   const { token } = useSelector((slice) => slice.user);
   const { title, description, image } = useSelector(
@@ -49,11 +48,26 @@ const AddBlog = () => {
           class: NestedList,
           inlineToolbar: true,
         },
-        CodeTool: CodeTool,
-        Marker: Marker,
-        Underline: Underline,
-        Embed: Embed,
-
+        CodeTool,
+        Marker,
+        Underline,
+        Embed,
+        image: {
+          class: ImageTool,
+          config: {
+            uploader: {
+              async uploadByFile(image) {
+                return {
+                  success: 1,
+                  file: {
+                    url: URL.createObjectURL(image),
+                    image,
+                  },
+                };
+              },
+            },
+          },
+        },
       },
       onChange: async () => {
         let data = await editorjsRef.current.save();
@@ -85,22 +99,29 @@ const AddBlog = () => {
   const handlePostBlog = async (e) => {
     e.preventDefault();
     console.log(blogData);
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/blogs`,
-        blogData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      toast.success(res.data.message);
-      return navigate("/");
-    } catch (error) {
-      toast.error(error.response.data.message);
-    }
+    formData.append("title", blogData.title);
+    formData.append("description", blogData.description);
+    formData.append("image", blogData.image);
+    formData.append("content", JSON.stringify(blogData.content));
+
+
+
+    // try {
+    //   const res = await axios.post(
+    //     `${import.meta.env.VITE_BACKEND_URL}/blogs`,
+    //     formData,
+    //     {
+    //       headers: {
+    //         "Content-Type": "multipart/form-data",
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     }
+    //   );
+    //   toast.success(res.data.message);
+    //   return navigate("/");
+    // } catch (error) {
+    //   toast.error(error.response.data.message);
+    // }
   };
 
   const fetchBlogById = async () => {

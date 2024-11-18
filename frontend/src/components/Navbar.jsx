@@ -9,7 +9,7 @@ const Navbar = () => {
   const { token, name } = useSelector((state) => state.user);
   return (
     <>
-      <nav className="w-full h-24 px-20 flex justify-between items-center shadow-lg">
+      <nav className="w-full h-24 px-20 flex justify-between items-center shadow-lg mb-20">
         <div className="flex gap-5 items-center">
           <div>
             <Link to={"/"}>

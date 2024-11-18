@@ -10,39 +10,45 @@ const createBlog = async (req, res) => {
     const creator = req.user;
     const image = req.file;
     const { title, description, draft, content } = req.body;
-    if (!title || !description || !content) {
-      return res.status(400).json({
-        success: false,
-        message: "Please fill all the fields",
-      });
-    }
-    const findUser = await User.findById(creator);
-    if (!findUser) {
-      res.status(500).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-    const { secure_url, public_id } = await uploadImage(image.path);
-    fs.unlinkSync(image.path);
+    
 
-    const blogId = `${title.toLowerCase().split(/[^a-zA-Z0-9]+/).join("-")}${randomUUID()}`; 
-    const blog = await Blog.create({
-      title,
-      description,
-      draft,
-      creator,
-      image: secure_url,
-      imageId: public_id,
-      blogId,
-      content,
-    });
-    await User.findByIdAndUpdate(creator, { $push: { blogs: blog._id } });
-    return res.status(200).json({
-      success: true,
-      message: "Blog created successfully",
-      blog,
-    });
+
+
+
+
+    // if (!title || !description || !content) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Please fill all the fields",
+    //   });
+    // }
+    // const findUser = await User.findById(creator);
+    // if (!findUser) {
+    //   res.status(500).json({
+    //     success: false,
+    //     message: "User not found",
+    //   });
+    // }
+    // const { secure_url, public_id } = await uploadImage(image.path);
+    // fs.unlinkSync(image.path);
+
+    // const blogId = `${title.toLowerCase().split(/[^a-zA-Z0-9]+/).join("-")}${randomUUID()}`; 
+    // const blog = await Blog.create({
+    //   title,
+    //   description,
+    //   draft,
+    //   creator,
+    //   image: secure_url,
+    //   imageId: public_id,
+    //   blogId,
+    //   content,
+    // });
+    // await User.findByIdAndUpdate(creator, { $push: { blogs: blog._id } });
+    // return res.status(200).json({
+    //   success: true,
+    //   message: "Blog created successfully",
+    //   blog,
+    // });
   } catch (error) {
     return res.status(500).json({
       success: false,
