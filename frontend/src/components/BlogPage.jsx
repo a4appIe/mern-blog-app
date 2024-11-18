@@ -15,7 +15,7 @@ const BlogPage = () => {
   const { blogId } = useParams();
   // const user = JSON.parse(localStorage.getItem("user"));
   const { token, email, id: userId } = useSelector((state) => state.user);
-  const { likes, comments } = useSelector((state) => state.selectedBlog);
+  const { likes, comments, content } = useSelector((state) => state.selectedBlog);
   const { isOpen } = useSelector((state) => state.comment);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -113,6 +113,45 @@ const BlogPage = () => {
               <i className="fi fi-sr-comments text-2xl"></i>
               <p className="text-2xl">{comments.length}</p>
             </div>
+          </div>
+
+          <div className="my-20">
+            {content.blocks.map((block) => {
+              if (block.type == "header") {
+                if (block.data.level == 2) {
+                  return (
+                    <h2 className="font-bold text-4xl my-4"
+                      dangerouslySetInnerHTML={{ __html: block.data.text }}
+                    ></h2>
+                  );
+                } else if (block.data.level == 3) {
+                  return (
+                    <h3 className="font-bold text-3xl my-4"
+                      dangerouslySetInnerHTML={{ __html: block.data.text }}
+                    ></h3>
+                  );
+                } else if (block.data.level == 4) {
+                  return (
+                    <h4  className="font-bold text-2xl my-4"
+                      dangerouslySetInnerHTML={{ __html: block.data.text }}
+                    ></h4>
+                  );
+                }
+              } else if (block.type == "paragraph") {
+                return (
+                  <p className="my-4" dangerouslySetInnerHTML={{ __html: block.data.text }}></p>
+                );
+              }
+              else if (block.type == "image") {
+                return (
+                  <div className="my-4">
+                    <img src={block.data.file.url} alt="" />
+                    <p className="text-center">{block.data.caption}</p>
+                  </div>
+                );
+              }
+
+            })}
           </div>
         </div>
       ) : (

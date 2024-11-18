@@ -9,48 +9,71 @@ const createBlog = async (req, res) => {
   try {
     const creator = req.user;
     const { title, description, draft } = req.body;
-    const {image, images} = req.files;
-    console.log(images);
+    const { image, images } = req.files;
     const content = JSON.parse(req.body.content);
 
-    
+    if (!title || !description || !content) {
+      return res.status(400).json({
+        success: false,
+        message: "Please fill all the fields",
+      });
+    }
 
+    const findUser = await User.findById(creator);
+    if (!findUser) {
+      res.status(500).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
+    // CLOUDINARY ------------------------------
 
+    let imageIndex = 0;
 
+    for (let i = 0; i < content.blocks.length; i++) {
+      const block = content.blocks[i];
+      if (block.type === "image") {
+        const { secure_url, public_id } = await uploadImage(
+          `data:image/jpeg;base64,${images[imageIndex].buffer.toString(  // comma error was fixed!!
+            "base64"
+          )}`
+        );
 
-    // if (!title || !description || !content) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Please fill all the fields",
-    //   });
-    // }
-    // const findUser = await User.findById(creator);
-    // if (!findUser) {
-    //   res.status(500).json({
-    //     success: false,
-    //     message: "User not found",
-    //   });
-    // }
-    // const { secure_url, public_id } = await uploadImage(image.path);
+        block.data.file = {
+          url: secure_url,
+          imageId: public_id,
+        };
 
-    // const blogId = `${title.toLowerCase().split(/[^a-zA-Z0-9]+/).join("-")}${randomUUID()}`; 
-    // const blog = await Blog.create({
-    //   title,
-    //   description,
-    //   draft,
-    //   creator,
-    //   image: secure_url,
-    //   imageId: public_id,
-    //   blogId,
-    //   content,
-    // });
-    // await User.findByIdAndUpdate(creator, { $push: { blogs: blog._id } });
-    // return res.status(200).json({
-    //   success: true,
-    //   message: "Blog created successfully",
-    //   blog,
-    // });
+        imageIndex++;
+      }
+    }
+
+    const { secure_url, public_id } = await uploadImage(
+      `data:image/jpeg;base64,${image[0].buffer.toString("base64")}`
+    );
+
+    const blogId = `${title
+      .toLowerCase()
+      .split(/[^a-zA-Z0-9]+/)
+      .join("-")}${randomUUID()}`;
+    const blog = await Blog.create({
+      title,
+      description,
+      draft,
+      creator,
+      image: secure_url,
+      imageId: public_id,
+      blogId,
+      content,
+    });
+
+    await User.findByIdAndUpdate(creator, { $push: { blogs: blog._id } });
+    return res.status(200).json({
+      success: true,
+      message: "Blog created successfully",
+      blog,
+    });
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -79,7 +102,7 @@ const getBlog = async (req, res) => {
 const getSingleBlog = async (req, res) => {
   try {
     const { blogId } = req.params;
-    console.log(blogId)
+    console.log(blogId);
     const blog = await Blog.findOne({ blogId })
       .populate({
         path: "comments",
@@ -118,7 +141,7 @@ const updateBlog = async (req, res) => {
     const creator = req.user;
     const { id } = req.params;
     const { title, description, draft } = req.body;
-    const blog = await Blog.findOne({blogId: id});
+    const blog = await Blog.findOne({ blogId: id });
     if (!blog) {
       return res.status(500).json({
         success: false,
@@ -132,8 +155,8 @@ const updateBlog = async (req, res) => {
       });
     }
 
-    if(image){
-      await deleteImage(blog.imageId)
+    if (image) {
+      await deleteImage(blog.imageId);
       const { secure_url, public_id } = await uploadImage(image.path);
       blog.image = secure_url;
       blog.imageId = public_id;
