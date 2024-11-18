@@ -103,25 +103,30 @@ const AddBlog = () => {
     formData.append("description", blogData.description);
     formData.append("image", blogData.image);
     formData.append("content", JSON.stringify(blogData.content));
+    blogData.content.blocks.forEach(block => {
+      if(block.type === "image"){
+        formData.append("images", block.data.file.image)
+      }
+    });
 
 
 
-    // try {
-    //   const res = await axios.post(
-    //     `${import.meta.env.VITE_BACKEND_URL}/blogs`,
-    //     formData,
-    //     {
-    //       headers: {
-    //         "Content-Type": "multipart/form-data",
-    //         Authorization: `Bearer ${token}`,
-    //       },
-    //     }
-    //   );
-    //   toast.success(res.data.message);
-    //   return navigate("/");
-    // } catch (error) {
-    //   toast.error(error.response.data.message);
-    // }
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/blogs`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success(res.data.message);
+      return navigate("/");
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
   };
 
   const fetchBlogById = async () => {

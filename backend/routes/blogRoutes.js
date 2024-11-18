@@ -6,13 +6,23 @@ const {
   getSingleBlog,
   updateBlog,
   deleteBlog,
-  likeBlog
+  likeBlog,
 } = require("../controllers/blogController");
 const verifyUser = require("../middlewares/auth");
-const { postComment, deleteComment, editComment, likeComment } = require("../controllers/commentController");
+const {
+  postComment,
+  deleteComment,
+  editComment,
+  likeComment,
+} = require("../controllers/commentController");
 const upload = require("../utils/multer");
 
-router.post("/blogs", verifyUser, upload.single("image"), createBlog);
+router.post(
+  "/blogs",
+  verifyUser,
+  upload.fields([{ name: "image" }, { name: "images" }]),
+  createBlog
+);
 
 router.get("/blogs", getBlog);
 

@@ -8,8 +8,11 @@ const { randomUUID } = new ShortUniqueId({ length: 15 });
 const createBlog = async (req, res) => {
   try {
     const creator = req.user;
-    const image = req.file;
-    const { title, description, draft, content } = req.body;
+    const { title, description, draft } = req.body;
+    const {image, images} = req.files;
+    console.log(images);
+    const content = JSON.parse(req.body.content);
+
     
 
 
@@ -30,7 +33,6 @@ const createBlog = async (req, res) => {
     //   });
     // }
     // const { secure_url, public_id } = await uploadImage(image.path);
-    // fs.unlinkSync(image.path);
 
     // const blogId = `${title.toLowerCase().split(/[^a-zA-Z0-9]+/).join("-")}${randomUUID()}`; 
     // const blog = await Blog.create({
