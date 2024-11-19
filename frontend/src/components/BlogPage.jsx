@@ -72,7 +72,7 @@ const BlogPage = () => {
   }, [blogId]);
 
   return (
-    <div className="max-w-[750px] mx-auto">
+    <div className="w-1/3 mx-auto">
       {blogData ? (
         <div>
           <h1 className="text-4xl font-bold text-gray-700 capitalize">

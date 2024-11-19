@@ -35,7 +35,8 @@ const createBlog = async (req, res) => {
       const block = content.blocks[i];
       if (block.type === "image") {
         const { secure_url, public_id } = await uploadImage(
-          `data:image/jpeg;base64,${images[imageIndex].buffer.toString(  // comma error was fixed!!
+          `data:image/jpeg;base64,${images[imageIndex].buffer.toString(
+            // comma error was fixed!!
             "base64"
           )}`
         );
@@ -56,7 +57,7 @@ const createBlog = async (req, res) => {
     const blogId = `${title
       .toLowerCase()
       .split(/[^a-zA-Z0-9]+/)
-      .join("-")}${randomUUID()}`;
+      .join("-")}-${randomUUID()}`;
     const blog = await Blog.create({
       title,
       description,
@@ -141,7 +142,10 @@ const updateBlog = async (req, res) => {
     const creator = req.user;
     const { id } = req.params;
     const { title, description, draft } = req.body;
+    const content = JSON.parse(req.body.content);
+    const existingImages = JSON.parse(req.body.existingImages);
     const blog = await Blog.findOne({ blogId: id });
+
     if (!blog) {
       return res.status(500).json({
         success: false,
@@ -155,17 +159,54 @@ const updateBlog = async (req, res) => {
       });
     }
 
-    if (image) {
+    let imagesToDelete = blog.content.blocks
+      .filter((block) => block.type == "image")
+      .filter(
+        (block) => !existingImages.find(({ url }) => url == block.data.file.url)
+      )
+      .map((block) => block.data.file.imageId);
+
+    if (imagesToDelete.length > 0) {
+      await Promise.all(imagesToDelete.map((id) => deleteImage(id)));
+    }
+
+    // CLOUDINARY
+
+    if (req.files.images) {
+      let imageIndex = 0;
+
+      for (let i = 0; i < content.blocks.length; i++) {
+        const block = content.blocks[i];
+        if (block.type === "image" && block.data.file.image) {
+          const { secure_url, public_id } = await uploadImage(
+            `data:image/jpeg;base64,${req.files.images[imageIndex].buffer.toString(
+              // comma error was fixed!!
+              "base64"
+            )}`
+          );
+
+          block.data.file = {
+            url: secure_url,
+            imageId: public_id,
+          };
+
+          imageIndex++;
+        }
+      }
+    }
+
+    if (req.files.image) {
       await deleteImage(blog.imageId);
-      const { secure_url, public_id } = await uploadImage(image.path);
+      const { secure_url, public_id } = await uploadImage(`data:image/jpeg;base64,${req.files.image[0].buffer.toString("base64")}`);
       blog.image = secure_url;
       blog.imageId = public_id;
-      fs.unlinkSync(image.path);
     }
 
     blog.title = title || blog.title;
     blog.description = description || blog.description;
     blog.draft = draft || blog.draft;
+    blog.content = content || blog.content;
+
     await blog.save();
 
     return res.status(200).json({

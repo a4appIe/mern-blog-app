@@ -18,7 +18,7 @@ const AddBlog = () => {
   const formData = new FormData();
   const { id } = useParams();
   const { token } = useSelector((slice) => slice.user);
-  const { title, description, image } = useSelector(
+  const { title, description, image, content } = useSelector(
     (slice) => slice.selectedBlog
   );
   const navigate = useNavigate();
@@ -34,6 +34,7 @@ const AddBlog = () => {
     editorjsRef.current = new EditorJS({
       holder: "editor",
       placeholder: "write something...",
+      data: content,
       tools: {
         header: {
           class: Header,
@@ -78,10 +79,32 @@ const AddBlog = () => {
 
   const handleUpdateBlog = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append("title", blogData.title);
+    formData.append("description", blogData.description);
+    formData.append("image", blogData.image);
+    formData.append("content", JSON.stringify(blogData.content));
+
+    let existingImages = [];
+    blogData.content.blocks.forEach((block) => {
+      if (block.type === "image") {
+        if (block.data.file.image) {
+          formData.append("images", block.data.file.image);
+        } else {
+          existingImages.push({
+            url: block.data.file.url,
+            imageId: block.data.file.imageId,
+          });
+        }
+      }
+    });
+
+    formData.append("existingImages", JSON.stringify(existingImages));
+
     try {
       const res = await axios.patch(
         `${import.meta.env.VITE_BACKEND_URL}/blogs/${id}`,
-        blogData,
+        formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -103,13 +126,11 @@ const AddBlog = () => {
     formData.append("description", blogData.description);
     formData.append("image", blogData.image);
     formData.append("content", JSON.stringify(blogData.content));
-    blogData.content.blocks.forEach(block => {
-      if(block.type === "image"){
-        formData.append("images", block.data.file.image)
+    blogData.content.blocks.forEach((block) => {
+      if (block.type === "image") {
+        formData.append("images", block.data.file.image);
       }
     });
-
-
 
     try {
       const res = await axios.post(
@@ -134,6 +155,7 @@ const AddBlog = () => {
       title: title,
       description: description,
       image: image,
+      content: content,
     });
   };
   useEffect(() => {

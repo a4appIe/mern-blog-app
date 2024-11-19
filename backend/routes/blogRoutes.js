@@ -28,7 +28,12 @@ router.get("/blogs", getBlog);
 
 router.get("/blogs/:blogId", getSingleBlog);
 
-router.patch("/blogs/:id", verifyUser, upload.single("image"), updateBlog);
+router.patch(
+  "/blogs/:id",
+  verifyUser,
+  upload.fields([{ name: "image" }, { name: "images" }]),
+  updateBlog
+);
 
 router.delete("/blogs/:id", verifyUser, deleteBlog);
 
