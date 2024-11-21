@@ -13,7 +13,6 @@ import { setIsOpen } from "../utils/commentSlice";
 
 const BlogPage = () => {
   const { blogId } = useParams();
-  // const user = JSON.parse(localStorage.getItem("user"));
   const { token, email, id: userId } = useSelector((state) => state.user);
   const { likes, comments, content } = useSelector((state) => state.selectedBlog);
   const { isOpen } = useSelector((state) => state.comment);
@@ -72,7 +71,7 @@ const BlogPage = () => {
   }, [blogId]);
 
   return (
-    <div className="w-1/3 mx-auto">
+    <div className="w-1/3 mx-auto mt-10">
       {blogData ? (
         <div>
           <h1 className="text-4xl font-bold text-gray-700 capitalize">
@@ -82,7 +81,7 @@ const BlogPage = () => {
           <img
             src={blogData.image}
             alt=""
-            className="w-full h-[400px] object-cover mt-5"
+            className="w-full h-[280px] object-cover mt-5"
           />
           {token && email === blogData.creator.email && (
             <Link to={"/edit/" + blogData.blogId}>
@@ -115,12 +114,12 @@ const BlogPage = () => {
             </div>
           </div>
 
-          <div className="my-20">
+          <div className="my-10">
             {content.blocks.map((block) => {
               if (block.type == "header") {
                 if (block.data.level == 2) {
                   return (
-                    <h2 className="font-bold text-4xl my-4"
+                    <h2 className="font-bold text-2xl my-4"
                       dangerouslySetInnerHTML={{ __html: block.data.text }}
                     ></h2>
                   );
@@ -132,7 +131,7 @@ const BlogPage = () => {
                   );
                 } else if (block.data.level == 4) {
                   return (
-                    <h4  className="font-bold text-2xl my-4"
+                    <h4  className="font-bold text-4xl my-4"
                       dangerouslySetInnerHTML={{ __html: block.data.text }}
                     ></h4>
                   );
@@ -147,6 +146,13 @@ const BlogPage = () => {
                   <div className="my-4">
                     <img src={block.data.file.url} alt="" />
                     <p className="text-center">{block.data.caption}</p>
+                  </div>
+                );
+              }
+              else if (block.type == "CodeTool") {
+                return (
+                  <div className="my-4 bg-slate-700 p-5 rounded-md text-white">
+                    <code>{block.data.code}</code>
                   </div>
                 );
               }

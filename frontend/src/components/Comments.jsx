@@ -47,7 +47,7 @@ const Comments = () => {
   };
 
   return (
-    <div className="bg-white h-screen fixed top-0 right-0 w-[400px] border-l drop-shadow-lg p-5 overflow-y-scroll">
+    <div className="bg-white h-screen fixed top-0 right-0 w-[400px] border-l drop-shadow-lg p-5 overflow-y-scroll z-10">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl">Responses ({comments.length})</h1>
         <i
