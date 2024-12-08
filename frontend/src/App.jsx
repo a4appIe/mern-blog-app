@@ -1,4 +1,4 @@
-import "./App.css";
+// import "./App.css";
 import { Route, Routes } from "react-router-dom";
 import Authform from "./pages/Authform";
 import Navbar from "./components/Navbar";

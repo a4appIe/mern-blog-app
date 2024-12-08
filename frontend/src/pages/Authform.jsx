@@ -9,7 +9,7 @@ import Input from "../components/Input";
 const Authform = ({ type }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { token } = JSON.parse(localStorage.getItem("user"));
+  // const { token } = JSON.parse(localStorage.getItem("user"));
   const [userData, setUserData] = useState({
     name: "",
     email: "",

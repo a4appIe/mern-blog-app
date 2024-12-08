@@ -19,4 +19,4 @@ const deleteImage = async (imageId) => {
   }
 };
 
-module.exports = {uploadImage, deleteImage};
+module.exports = { uploadImage, deleteImage };

@@ -103,7 +103,6 @@ const getBlog = async (req, res) => {
 const getSingleBlog = async (req, res) => {
   try {
     const { blogId } = req.params;
-    console.log(blogId);
     const blog = await Blog.findOne({ blogId })
       .populate({
         path: "comments",
@@ -116,9 +115,7 @@ const getSingleBlog = async (req, res) => {
         path: "creator",
         select: "name email",
       });
-    console.log(blog);
     if (!blog) {
-      console.log("not found");
       return res.status(404).json({
         success: false,
         message: "Blog not found",
@@ -130,7 +127,6 @@ const getSingleBlog = async (req, res) => {
       blog,
     });
   } catch (error) {
-    // console.log(error)
     return res.status(500).json({
       success: false,
       message: error.message,

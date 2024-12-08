@@ -8,7 +8,7 @@ const Input = ({ type, placeholder, setUserData, field, value, icon }) => {
   return (
     <div className="relative w-full">
       <i
-        class={`fi ${icon} absolute z-10 top-1/2 -translate-y-1/2 left-3 text-gray-400`}
+        className={`fi ${icon} absolute z-10 top-1/2 -translate-y-1/2 left-3 text-gray-400`}
       ></i>
       <input
         type={type === "password" ? (show ? "text" : type) : type}
