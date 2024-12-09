@@ -154,10 +154,50 @@ const likeComment = async (req, res) => {
     });
   }
 };
+const addNestedComment = async (req, res) => {
+  try {
+    const userId = req.user;
+    const { id: blogId, parentCommentId } = req.params;
+    const { reply } = req.body;
+    const comment = await Comment.findById(parentCommentId);
+    const blog = await Blog.findById(blogId);
+    if (!blog) {
+      return res.status(500).json({
+        success: false,
+        message: "Blog not found",
+      });
+    }
+    if (!comment) {
+      return res.status(500).json({
+        success: false,
+        message: "Parent comment not found",
+      });
+    }
+    const newReply = await Comment.create({
+      comment: reply,
+      blog: blogId,
+      user: userId,
+      parentComment: parentCommentId,
+    });
+    await Comment.findByIdAndUpdate(parentCommentId, {
+      $push: { replies: newReply._id },
+    });
+    return res.status(200).json({
+      success: true,
+      message: "Reply added successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {
   postComment,
   deleteComment,
   editComment,
   likeComment,
+  addNestedComment,
 };

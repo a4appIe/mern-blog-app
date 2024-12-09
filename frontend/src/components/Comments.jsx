@@ -34,15 +34,19 @@ const Comments = () => {
 
   const handleCommentLike = async (commentId) => {
     try {
-        let res = await axios.patch( `${import.meta.env.VITE_BACKEND_URL}/blogs/like-comment/${commentId}`, {}, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-        toast.success(res.data.message)
-        dispatch(setCommentLikes({commentId, userId}));
+      let res = await axios.patch(
+        `${import.meta.env.VITE_BACKEND_URL}/blogs/like-comment/${commentId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success(res.data.message);
+      dispatch(setCommentLikes({ commentId, userId }));
     } catch (error) {
-        toast.error(error.response.data.message)
+      toast.error(error.response.data.message);
     }
   };
 
@@ -98,16 +102,25 @@ const Comments = () => {
                 <i className="fi fi-br-menu-dots-vertical cursor-pointer"></i>
               </div>
               <p className="text-gray-600">{comment.comment}</p>
-              <div
-                onClick={()=>handleCommentLike(comment._id)}
-                className="w-fit cursor-pointer flex gap-1 items-center"
-              >
-                {comment.likes.includes(userId) ? (
-                  <i className="fi fi-sr-thumbs-up text-md mt-1 ml-1"></i>
-                ) : (
-                  <i className="fi fi-rr-social-network text-md mt-1 ml-1"></i>
-                )}
-                <p className="text-sm">{comment.likes.length}</p>
+              <div className="flex items-center justify-between pr-3">
+                <div className="flex items-center justify-between w-1/2">
+                  <div
+                    onClick={() => handleCommentLike(comment._id)}
+                    className="w-fit cursor-pointer flex gap-2 items-center"
+                  >
+                    {comment.likes.includes(userId) ? (
+                      <i className="fi fi-sr-thumbs-up text-lg mt-2 ml-1"></i>
+                    ) : (
+                      <i className="fi fi-rr-social-network text-lg mt-2 ml-1"></i>
+                    )}
+                    <p className="text-sm mt-1">{comment.likes.length}</p>
+                  </div>
+                  <div className="flex gap-2 cursor-pointer">
+                    <i className="fi fi-sr-comments text-lg"></i>
+                    <p>6</p>
+                  </div>
+                </div>
+                <p className="hover:underline cursor-pointer">reply</p>
               </div>
             </div>
           </div>

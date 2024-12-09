@@ -20,6 +20,18 @@ const commentSchema = mongoose.Schema(
         ref: "User",
       },
     ],
+    // for nested comments
+    replies: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+    ],
+    parentComment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment",
+      default: null,
+    },
   },
   { timestamps: true }
 );
