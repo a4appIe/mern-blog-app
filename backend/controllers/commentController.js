@@ -178,13 +178,20 @@ const addNestedComment = async (req, res) => {
       blog: blogId,
       user: userId,
       parentComment: parentCommentId,
+    }).then((reply) => {
+      return reply.populate({
+        path: "user",
+        select: "name email",
+      });
     });
+    
     await Comment.findByIdAndUpdate(parentCommentId, {
       $push: { replies: newReply._id },
     });
     return res.status(200).json({
       success: true,
       message: "Reply added successfully",
+      newReply,
     });
   } catch (error) {
     return res.status(500).json({

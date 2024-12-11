@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsOpen } from "../utils/commentSlice";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { setCommentLikes, setComments } from "../utils/selectedBlogSlice";
+import { setCommentLikes, setComments, setReplies } from "../utils/selectedBlogSlice";
 import formatDate from "../utils/formatDate";
 
 const Comments = () => {
@@ -66,6 +66,7 @@ const Comments = () => {
           token={token}
           activeReply={activeReply}
           setActiveReply={setActiveReply}
+          dispatch = {dispatch}
         />
       </div>
     </div>
@@ -79,6 +80,7 @@ const DisplayComments = ({
   token,
   activeReply,
   setActiveReply,
+  dispatch
 }) => {
   const [reply, setReply] = useState("");
 
@@ -98,9 +100,10 @@ const DisplayComments = ({
         }
       );
       console.log(res);
-
-      // dispatch(setComments(res.data.newComment));
+      
       setReply("");
+      setActiveReply(null);
+      dispatch(setReplies(res.data.newReply));
       return toast.success(res.data.message);
     } catch (error) {
       toast.error(error.response.data.message);
