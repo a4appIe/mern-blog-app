@@ -51,7 +51,7 @@ const selectedBlogSlice = createSlice({
               parentComment = {
                 ...comment,
                 replies: comment.replies.map((reply) =>
-                  reply._id === parentComment._id ? parentComment : reply
+                  reply._id == parentComment._id ? parentComment : reply
                 ),
               };
               break;
@@ -60,9 +60,10 @@ const selectedBlogSlice = createSlice({
         }
         return parentComment;
       }
+
       let parentComment = findParentComment(state.comments);
       state.comments = state.comments.map((comment) =>
-        comment._id === parentComment._id ? parentComment : comment
+        comment._id == parentComment._id ? parentComment : comment
       );
     },
   },
