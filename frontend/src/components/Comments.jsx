@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsOpen } from "../utils/commentSlice";
@@ -173,7 +174,7 @@ const DisplayComments = ({
                 </div>
                 <div className="flex gap-2 cursor-pointer">
                   <i className="fi fi-sr-comments text-lg"></i>
-                  <p>{comment.replies.length}</p>
+                  <p>{comment?.replies?.length}</p>
                 </div>
               </div>
               <p
@@ -206,7 +207,7 @@ const DisplayComments = ({
                 </button>
               </div>
             )}
-            {comment.replies.length > 0 && (
+            {comment?.replies?.length > 0 && (
               <div className="pl-5 border-l-4 border-green-500">
                 <DisplayComments
                   comments={comment.replies}

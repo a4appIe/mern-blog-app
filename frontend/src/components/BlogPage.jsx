@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/jsx-key */
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -29,7 +31,7 @@ const BlogPage = () => {
       );
       setBlogData(blog);
 
-      if (blog.likes.includes(userId)) {
+      if (blog?.likes?.includes(userId)) {
         setIsLiked((prev) => !prev);
       }
 
@@ -110,7 +112,7 @@ const BlogPage = () => {
               }}
             >
               <i className="fi fi-sr-comments text-2xl"></i>
-              <p className="text-2xl">{comments.length}</p>
+              <p className="text-2xl">{comments?.length}</p>
             </div>
           </div>
 
@@ -119,13 +121,13 @@ const BlogPage = () => {
               if (block.type == "header") {
                 if (block.data.level == 2) {
                   return (
-                    <h2 className="font-bold text-2xl my-4"
+                    <h2 className="font-bold text-2xl my-4" key={""}
                       dangerouslySetInnerHTML={{ __html: block.data.text }}
                     ></h2>
                   );
                 } else if (block.data.level == 3) {
                   return (
-                    <h3 className="font-bold text-3xl my-4"
+                    <h3 className="font-bold text-3xl my-4" 
                       dangerouslySetInnerHTML={{ __html: block.data.text }}
                     ></h3>
                   );

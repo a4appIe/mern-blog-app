@@ -130,7 +130,7 @@ const getSingleBlog = async (req, res) => {
           })
           .lean();
           comment.replies = populatedComment.replies;
-          if(comment.replies.length > 0){
+          if(comment?.replies?.length > 0){
             await populateReplies(comment.replies);
           }
       }
