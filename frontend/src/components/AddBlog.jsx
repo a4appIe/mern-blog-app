@@ -1,6 +1,6 @@
 import axios from "axios";
-import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import EditorJS from "@editorjs/editorjs";
@@ -127,7 +127,7 @@ const AddBlog = () => {
     formData.append("description", blogData.description);
     formData.append("image", blogData.image);
     formData.append("content", JSON.stringify(blogData.content));
-    blogData.content.blocks.forEach((block) => {
+    blogData?.content?.blocks?.forEach((block) => {
       if (block.type === "image") {
         formData.append("images", block.data.file.image);
       }

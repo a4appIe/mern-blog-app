@@ -17,6 +17,7 @@ const verifyUser = async (req, res, next) => {
       });
     }
     req.user = user.id;
+    console.log(req.user)
     return next();
   } catch (error) {
     return res.status(500).json({

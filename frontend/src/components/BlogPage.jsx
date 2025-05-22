@@ -83,7 +83,7 @@ const BlogPage = () => {
           <img
             src={blogData.image}
             alt=""
-            className="w-full h-[280px] object-cover mt-5"
+            className="w-full h-[280px] object-cover mt-5 shadow outline outline-gray-200"
           />
           {token && email === blogData.creator.email && (
             <Link to={"/edit/" + blogData.blogId}>

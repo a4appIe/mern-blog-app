@@ -11,6 +11,7 @@ const createBlog = async (req, res) => {
     const creator = req.user;
     const { title, description, draft } = req.body;
     const { image, images } = req.files;
+    console.log(image[0].buffer)
     const content = JSON.parse(req.body.content);
 
     if (!title || !description || !content) {
@@ -54,6 +55,7 @@ const createBlog = async (req, res) => {
     const { secure_url, public_id } = await uploadImage(
       `data:image/jpeg;base64,${image[0].buffer.toString("base64")}`
     );
+    console.log(image[0].buffer.toString("base64"));
 
     const blogId = `${title
       .toLowerCase()
@@ -129,10 +131,10 @@ const getSingleBlog = async (req, res) => {
             },
           })
           .lean();
-          comment.replies = populatedComment.replies;
-          if(comment?.replies?.length > 0){
-            await populateReplies(comment.replies);
-          }
+        comment.replies = populatedComment.replies;
+        if (comment?.replies?.length > 0) {
+          await populateReplies(comment.replies);
+        }
       }
       return comments;
     }
@@ -150,7 +152,7 @@ const getSingleBlog = async (req, res) => {
       blog,
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res.status(500).json({
       success: false,
       message: error.message,

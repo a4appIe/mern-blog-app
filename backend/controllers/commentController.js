@@ -96,7 +96,7 @@ const editComment = async (req, res) => {
   try {
     const { id } = req.params;
     const creator = req.user;
-    const { updatedComment } = req.body;
+    const { updatedCommentContent } = req.body;
     const comment = await Comment.findById(id);
     if (!comment) {
       return res.status(500).json({
@@ -110,7 +110,7 @@ const editComment = async (req, res) => {
         message: "You are not authorize",
       });
     }
-    await Comment.findByIdAndUpdate(id, { comment: updatedComment });
+    await Comment.findByIdAndUpdate(id, { comment: updatedCommentContent });
     res.status(200).json({
       success: true,
       message: "Comment updated successfully",
