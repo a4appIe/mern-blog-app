@@ -27,7 +27,7 @@ const postComment = async (req, res) => {
     console.log(newComment);
 
     await Blog.updateOne({ _id: id }, { $push: { comments: newComment._id } });
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Comment added successfully",
       newComment,
@@ -45,46 +45,49 @@ const deleteComment = async (req, res) => {
     const creator = req.user;
     const comment = await Comment.findById(id);
     const blog = await Blog.findById(comment.blog);
+
     if (!comment) {
       return res.status(500).json({
         success: false,
         message: "Comment not found",
       });
     }
+
     if (!blog) {
       return res.status(500).json({
         success: false,
         message: "Blog not found",
       });
     }
+
     if (!(creator == comment.user) && !(creator == blog.creator)) {
       return res.status(500).json({
         success: false,
         message: "You are not authorized",
       });
     }
-    await Comment.deleteOne({ _id: id });
+
+    async function deleteCommentAndReplies(id) {
+      let comment = await Comment.findById(id);
+      for (let replyId of comment.replies) {
+        await deleteCommentAndReplies(replyId);
+      }
+      if(comment.parentComment){
+        await Comment.findByIdAndUpdate(comment.parentComment, {
+          $pull: {replies: id}
+        })
+      }
+      await Comment.findByIdAndDelete(id);
+    }
+
+    await deleteCommentAndReplies(id);
+
     await Blog.findByIdAndUpdate(comment.blog, { $pull: { comments: id } });
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Comment deleted successfully",
     });
-    // if(!(creator == blog.creator)){
-    //   return res.status(500).json({
-    //     success: false,
-    //     message: "You are not authorized",
-    //   });
-    // }
-
-    // await Blog.updateOne(
-    //   { _id: id },
-    //   { $push: { comments: newComment._id } }
-    // );
-    // res.status(200).json({
-    //   success: true,
-    //   message: "Comment added successfully",
-    // });
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -105,15 +108,27 @@ const editComment = async (req, res) => {
       });
     }
     if (!(comment.user == creator)) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
-        message: "You are not authorize",
+        message: "You are not authorized",
       });
     }
-    await Comment.findByIdAndUpdate(id, { comment: updatedCommentContent });
-    res.status(200).json({
+    const updatedComment = await Comment.findByIdAndUpdate(
+      id,
+      {
+        comment: updatedCommentContent,
+      },
+      { new: true }
+    ).then((comment) =>
+      comment.populate({
+        path: "user",
+        select: "name email",
+      })
+    );
+    return res.status(200).json({
       success: true,
       message: "Comment updated successfully",
+      updatedComment,
     });
   } catch (error) {
     return res.status(500).json({
@@ -136,13 +151,13 @@ const likeComment = async (req, res) => {
     console.log(comment.likes);
     if (!comment.likes.includes(userId)) {
       await Comment.updateOne({ _id: id }, { $push: { likes: userId } });
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "Comment liked successfully",
       });
     } else {
       await Comment.updateOne({ _id: id }, { $pull: { likes: userId } });
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "Comment disliked successfully",
       });
@@ -184,7 +199,7 @@ const addNestedComment = async (req, res) => {
         select: "name email",
       });
     });
-    
+
     await Comment.findByIdAndUpdate(parentCommentId, {
       $push: { replies: newReply._id },
     });

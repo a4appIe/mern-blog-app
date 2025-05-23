@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+/* eslint-disable no-unused-vars */
+import { useState } from "react";
+import PropTypes from "prop-types";
 
 const Input = ({ type, placeholder, setUserData, field, value, icon }) => {
   const [show, setShow] = useState(false);
@@ -30,6 +32,14 @@ const Input = ({ type, placeholder, setUserData, field, value, icon }) => {
       )}
     </div>
   );
+};
+Input.propTypes = {
+  type: PropTypes.string.isRequired,
+  placeholder: PropTypes.string,
+  setUserData: PropTypes.func.isRequired,
+  field: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  icon: PropTypes.string,
 };
 
 export default Input;

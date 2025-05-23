@@ -1,4 +1,3 @@
-/* eslint-disable no-constant-condition */
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,15 +5,21 @@ import { setIsOpen } from "../utils/commentSlice";
 import axios from "axios";
 import toast from "react-hot-toast";
 import {
+  deleteCommentAndReplies,
   setCommentLikes,
   setComments,
   setReplies,
+  setUpdatedComment,
 } from "../utils/selectedBlogSlice";
 import formatDate from "../utils/formatDate";
 
 const Comments = () => {
   const dispatch = useDispatch();
-  const { _id: blogId, comments } = useSelector((state) => state.selectedBlog);
+  const {
+    _id: blogId,
+    comments,
+    creator: { _id: creatorId },
+  } = useSelector((state) => state.selectedBlog);
   const { token, id: userId } = useSelector((state) => state.user);
   const [comment, setComment] = useState("");
   const [activeReply, setActiveReply] = useState(null);
@@ -78,6 +83,7 @@ const Comments = () => {
           setCurrentPopup={setCurrentPopup}
           currentEditComment={currentEditComment}
           setCurrentEditComment={setCurrentEditComment}
+          creatorId={creatorId}
         />
       </div>
     </div>
@@ -95,6 +101,7 @@ const DisplayComments = ({
   setCurrentPopup,
   currentEditComment,
   setCurrentEditComment,
+  creatorId,
 }) => {
   const [reply, setReply] = useState("");
   const [updatedCommentContent, setUpdatedCommentContent] = useState("");
@@ -142,8 +149,8 @@ const DisplayComments = ({
       toast.error(error.response.data.message);
     }
   };
+
   const handleCommentUpdate = async (id) => {
-    console.log(id, "   ", updatedCommentContent)
     try {
       let res = await axios.patch(
         `${import.meta.env.VITE_BACKEND_URL}/blogs/edit-comment/${id}`,
@@ -154,17 +161,37 @@ const DisplayComments = ({
           },
         }
       );
-
-      setUpdatedCommentContent("");
-      setCurrentEditComment(null);
-      // dispatch(setReplies(res.data.newReply));
+      dispatch(setUpdatedComment(res.data.updatedComment));
       return toast.success(res.data.message);
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
+    } finally {
+      setUpdatedCommentContent("");
+      setCurrentEditComment(null);
     }
   };
-  // const handleCommentDelete = () => {};
+
+  const handleCommentDelete = async (id) => {
+    try {
+      let res = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/blogs/comment/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      dispatch(deleteCommentAndReplies(id));
+      return toast.success(res.data.message);
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    } finally {
+      setUpdatedCommentContent("");
+      setCurrentEditComment(null);
+    }
+  };
 
   const dispatch = useDispatch();
   return (
@@ -223,42 +250,50 @@ const DisplayComments = ({
                       </p>
                     </div>
                   </div>
-                  {currentPopup === comment._id ? (
-                    <div className="bg-gray-400 w-[70px] rounded-lg overflow-hidden">
-                      <p
-                        className="text-white text-center p-1 hover:bg-blue-500 cursor-pointer"
-                        onClick={() => {
-                          setCurrentEditComment(comment._id);
-                          setCurrentPopup(null);
-                        }}
-                      >
-                        Edit
-                      </p>
-                      <p
-                        className="text-red-500 text-center p-1 hover:text-white hover:bg-red-500 cursor-pointer"
-                        onClick={() => {
-                          // setCurrentEditComment(comment._id)
-                          setCurrentPopup(null);
-                        }}
-                      >
-                        Delete
-                      </p>
-                      <p
-                        className="text-center p-1 text-white bg-red-500 cursor-pointer"
-                        onClick={() =>
-                          setCurrentPopup((prev) =>
-                            prev == comment._id ? null : comment._id
-                          )
-                        }
-                      >
-                        cancel
-                      </p>
-                    </div>
+
+                  {comment?.user?._id === userId || userId === creatorId ? (
+                    currentPopup === comment._id ? (
+                      <div className="bg-gray-400 w-[70px] rounded-lg overflow-hidden">
+                        {comment?.user?._id === userId && (
+                          <p
+                            className="text-white text-center p-1 hover:bg-blue-500 cursor-pointer"
+                            onClick={() => {
+                              setCurrentEditComment(comment._id);
+                              setCurrentPopup(null);
+                            }}
+                          >
+                            Edit
+                          </p>
+                        )}
+
+                        <p
+                          className="text-red-500 text-center p-1 hover:text-white underline cursor-pointer"
+                          onClick={() => {
+                            handleCommentDelete(comment?._id);
+                            setCurrentPopup(null);
+                          }}
+                        >
+                          Delete
+                        </p>
+                        <p
+                          className="text-center p-1 text-white bg-red-400 cursor-pointer"
+                          onClick={() =>
+                            setCurrentPopup((prev) =>
+                              prev == comment._id ? null : comment._id
+                            )
+                          }
+                        >
+                          cancel
+                        </p>
+                      </div>
+                    ) : (
+                      <i
+                        className="fi fi-br-menu-dots-vertical cursor-pointer"
+                        onClick={() => setCurrentPopup(comment._id)}
+                      ></i>
+                    )
                   ) : (
-                    <i
-                      className="fi fi-br-menu-dots-vertical cursor-pointer"
-                      onClick={() => setCurrentPopup(comment._id)}
-                    ></i>
+                    ""
                   )}
                 </div>
                 <p className="text-gray-600">{comment.comment}</p>
@@ -325,6 +360,7 @@ const DisplayComments = ({
                   setCurrentPopup={setCurrentPopup}
                   currentEditComment={currentEditComment}
                   setCurrentEditComment={setCurrentEditComment}
+                  creatorId={creatorId}
                 />
               </div>
             )}
