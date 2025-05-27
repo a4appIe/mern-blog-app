@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/userSchema");
-const { generateJWT } = require("../utils/generateToken");
+const { generateJWT, verifyJWT } = require("../utils/generateToken");
+const transporter = require("../utils/transporter");
 
 const createUser = async (req, res) => {
   const { name, email, password } = req.body;
@@ -13,10 +14,31 @@ const createUser = async (req, res) => {
     }
     const user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({
-        message: "Email already exist.",
-        success: false,
-      });
+      if (user?.verify) {
+        return res.status(400).json({
+          message: "Email already exist.",
+          success: false,
+        });
+      } else {
+        let token = await generateJWT({
+          email: user.email,
+          id: user._id,
+        });
+
+        // EMAIL
+        const sentMail = transporter.sendMail({
+          from: "nitinbhagatxyz@gmail.com",
+          to: user?.email,
+          subject: "Veirfy Your Blogify Account",
+          text: "Please verify your blogify account",
+          html: `<h1>Click <a href="http://localhost:5173/verify-email/${token}">here</a> to verify</h1>`,
+        });
+
+        return res.status(400).json({
+          message: "Please check your email for verification",
+          success: false,
+        });
+      }
     }
     const hash = await bcrypt.hash(password, 10);
     const newUser = await User.create({ name, email, password: hash });
@@ -24,18 +46,22 @@ const createUser = async (req, res) => {
       email: newUser.email,
       id: newUser._id,
     });
-    // console.log(token);
+
+    // EMAIL
+    const sentMail = transporter.sendMail({
+      from: "nitinbhagatxyz@gmail.com",
+      to: email,
+      subject: "Veirfy Your Blogify Account",
+      text: "Please verify your blogify account",
+      html: `<h1>Click <a href="http://localhost:5173/verify-email/${token}">here</a> to verify</h1>`,
+    });
+
     return res.status(200).json({
-      message: "User created successfully",
+      message: "Please check your email for verification",
       success: true,
-      user: {
-        id: newUser._id,
-        name: newUser.name,
-        email: newUser.email,
-        token,
-      },
     });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({
       message: "Something went wrong",
       success: false,
@@ -56,6 +82,27 @@ const loginUser = async (req, res) => {
     if (!user) {
       return res.status(500).json({
         message: "User not found",
+        success: false,
+      });
+    }
+    if (!user?.verify) {
+      // send verification emal again
+      let token = await generateJWT({
+        email: user.email,
+        id: user._id,
+      });
+
+      // EMAIL
+      const sentMail = transporter.sendMail({
+        from: "nitinbhagatxyz@gmail.com",
+        to: user?.email,
+        subject: "Veirfy Your Blogify Account",
+        text: "Please verify your blogify account",
+        html: `<h1>Click <a href="http://localhost:5173/verify-email/${token}">here</a> to verify</h1>`,
+      });
+
+      return res.status(500).json({
+        message: "Please verify your account before login",
         success: false,
       });
     }
@@ -187,6 +234,43 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const verifyToken = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const verifyToken = await verifyJWT(token);
+    if (!verifyToken) {
+      return res.status(402).json({
+        success: false,
+        message: "Invalid token/ email expired",
+      });
+    }
+    console.log(verifyToken);
+    const { id } = verifyToken;
+    const user = await User.findByIdAndUpdate(
+      id,
+      { verify: true },
+      { new: true }
+    );
+    if (!user) {
+      return res.status(200).json({
+        message: "User not found",
+        success: false,
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(200).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
@@ -194,4 +278,5 @@ module.exports = {
   getSingleUser,
   updateUser,
   deleteUser,
+  verifyToken,
 };

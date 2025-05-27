@@ -7,6 +7,8 @@ import { toast } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { login } from "../utils/userSlice";
 import Input from "../components/Input";
+import GOOGLE from "/google.svg";
+import { googleAuth } from "../utils/firebase";
 
 const Authform = ({ type }) => {
   const dispatch = useDispatch();
@@ -43,9 +45,16 @@ const Authform = ({ type }) => {
         `${import.meta.env.VITE_BACKEND_URL}/${type}`,
         userData
       );
-      dispatch(login(res.data.user));
-      navigate("/");
-      toast.success(res.data.message);
+
+      if (type === "signup") {
+        toast.success(res.data.message);
+        navigate("/signin");
+      } else {
+        toast.success(res.data.message);
+        dispatch(login(res.data.user));
+        navigate("/");
+      }
+
     } catch (error) {
       toast.error(error.response.data.message);
     } finally {
@@ -56,6 +65,16 @@ const Authform = ({ type }) => {
       });
     }
   };
+
+  const handleGoogleAuth = async ()=>{
+    try {
+      let data = await googleAuth();
+      console.log(data);
+      return data.user;
+    } catch (error) {
+      console.log(`Error -> ${error}`)
+    }
+  }
   return (
     <div className="w-full">
       <form
@@ -100,6 +119,11 @@ const Authform = ({ type }) => {
         >
           {type === "signin" ? "Sign in" : "Sign up"}
         </button>
+        <p>or</p>
+        <div onClick={handleGoogleAuth} className="w-full bg-white text-center py-2 rounded-md hover:cursor-pointer">
+          continue with 
+          <img src={GOOGLE} alt="" className="h-6 w-6 inline-block ml-1"/>
+        </div>
         <p className="text-sm">
           {type === "signin"
             ? "Not registered yet? "

@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import AddBlog from "./components/AddBlog"
 import BlogPage from "./components/BlogPage";
+import VerifyUser from "./components/VerifyUser";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/add-blog" element={<AddBlog />}></Route>
           <Route path="/blog/:blogId" element={<BlogPage />}></Route>
           <Route path="/edit/:id" element={<AddBlog />}></Route>
+          <Route path="/verify-email/:token" element={<VerifyUser />}></Route>
         </Route>
       </Routes>
     </div>

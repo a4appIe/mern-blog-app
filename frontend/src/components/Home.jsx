@@ -19,7 +19,7 @@ const Home = () => {
         <Link to={`/blog/${blog.blogId}`} key={blog._id}>
           <div className="flex bg-green-200 items-center justify-between border border-black px-5 py-2">
             <div className="w-[70%] h-full flex flex-col gap-4">
-              <p>{blog.creator.name}</p>
+              <p>{blog?.creator?.name}</p>
               <div className="h-[70%]">
                 <h2 className="text-2xl font-bold">{blog.title}</h2>
                 <p className="line-clamp-2">{blog.description}</p>

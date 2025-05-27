@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/jsx-key */
 import axios from "axios";
@@ -79,13 +80,13 @@ const BlogPage = () => {
           <h1 className="text-4xl font-bold text-gray-700 capitalize">
             {blogData.title}
           </h1>
-          <p className="text-gray-600">{blogData.creator.name}</p>
+          <p className="text-gray-600">{blogData?.creator?.name}</p>
           <img
             src={blogData.image}
             alt=""
             className="w-full h-[280px] object-cover mt-5 shadow outline outline-gray-200"
           />
-          {token && email === blogData.creator.email && (
+          {token && email === blogData?.creator?.email && (
             <Link to={"/edit/" + blogData.blogId}>
               <button className="bg-green-300 px-5 py-2 rounded hover:bg-green-400 mt-4">
                 Edit
