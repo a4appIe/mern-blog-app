@@ -69,8 +69,12 @@ const Authform = ({ type }) => {
   const handleGoogleAuth = async ()=>{
     try {
       let data = await googleAuth();
-      console.log(data);
-      return data.user;
+      console.log(data.user)
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/google-auth`, {
+        accessToken: data?.user?.accessToken,
+      });
+      console.log(res);
+      // return data.user;
     } catch (error) {
       console.log(`Error -> ${error}`)
     }

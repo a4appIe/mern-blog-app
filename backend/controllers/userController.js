@@ -2,6 +2,83 @@ const bcrypt = require("bcrypt");
 const User = require("../models/userSchema");
 const { generateJWT, verifyJWT } = require("../utils/generateToken");
 const transporter = require("../utils/transporter");
+const { getAuth } = require("firebase-admin/auth");
+
+// FIREBASE
+const admin = require("firebase-admin");
+admin.initializeApp({
+  credential: admin.credential.cert({
+    type: "service_account",
+    project_id: "blogify-66da3",
+    private_key_id: "b1b382c49044faa1ebb9782e25f71307c53666d0",
+    private_key:
+      "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDfzU357of8apuG\nmKRB9ltKhXFqvr1OD2E2TPweX8dJQ0q+IhjSbkKTczTMhhCmhE3oRX/ddv1pIyvn\nbBRb6WCrMsJU/pYMZtCtJXtsrb3glW6+hAKqcjGnZaI/mW0P8a+HZeh6bts/YKtQ\nYfYjVmZjTUiNs3cKYTk963EXqzhgizZH+bv+8a5gjrzUG6WtI1xM7lq6c+8ETXtQ\n44kTg5qFstm+vZ1DyQ0wvCFu+2WttFvQbVY60NQY35crdLzk5d0/ezsFsG/uY6cG\nWt5U1WCJ3l1Z8NILmtJQ9Gx87kq3DoP8LNTA08boqM1HmtQmAs8fMuuKd1xStfmT\n6LYTIW8TAgMBAAECggEAUzbTN4sppQE+st0uthgT+bGEalxhpxSw4K/fTqvuPZ93\nuxqSgCvfNVQw3Zs7ta6cCTFOSdpkfyNEv9e/+izcdMt61n+S6ymPjdHSAqbXYxot\nA0mydA3hyIxRt7QkiTkkOwP5XQy7GOWozUqfaqRFjca+o3GHYaSk1BEnC9XuMHbg\nuRlI6bLhofWA8Vjl89tV/vw8yUj4pPBkvKBpXrx8/BA1zhcizGLysb1I2qWOtpSn\nnKDI4fZfesDJFXxYygQN5b5/VreqWWmdI7N9D61CqPqlOuU23NkSuSURZYzWU5bH\n2IB1/AUSDcR54uWusx1Vq/mwLlN666rdD6XnOHn/gQKBgQD1hUIXR4hoGzt2+CAO\nIZts3hoc6Xvr/rpTbJHykHDpZKDM7i6PLBbBaMbMjwhKhsYMZ/8DyKHg6no1qq2w\nmzEm1moSihRmFfUIwEh8BqJ5eHfa10W/WzAzOUZ1vRz97FnvMb2ZeIdV+WCJJjK7\nsA2gRp1Qr8gPydHY1qqF8mYs7QKBgQDpWruoDAEbsX/0Q5cqfTrYzO+EMAv+gVyX\n3uLBDCweTCF+oQWMdW4PuVW0GR3e2Tz+tisHSAA0uWcwhe5mJhqo3D7+PNawvy1U\nrca8XjobHC+7RDKI1ZCdOGAHHEkF2olDG13EJOI6nK6NVwgZi4PMan4c3wRBSB2w\n2XNmcA6L/wKBgHNniNJScF6m9kOMi9y4lUsN9u5CHVqnaEOQU+XVWQ2LnD3XcxEf\nIy8UJeW/EaGeSfdI5siLhPOoo3sYV/4cZHUh8cf3GXGGvp+3ahrKL5KzOnsmFwXE\nQhrBwEnVc4wzjW5uTfWWft69kk/FIbGxJiaBKq7jgUFSlw26kXrWnopdAoGBAMuv\n5D9CAzGeFPcsjGWNG/GjqKn0mnOTjTQPXFRvgI8NmusCOGqrEd/twW5LwjQD4Wbf\nsd1QLsXW08iaD0bgmcKtRNr8VdW/eh0A9ojzorqJNuy6EXY5HFrvm3p5aRAP+mI2\nH/mWzFWm8AH1Zt+NVQT4K46d6APno+r7U+ylgT0XAoGBAKfwhZlEPq45PXVTWXAR\nuvVEkropAXttJbAeTxG5/1LyU2XJMAG4rJeSrrpEzpBcN98fNKTWFGRSP9S00tfL\nC2QoLO3fYSk4pv8pwNYPHevaSyEwlMQ3F0XG6h6qyMdgRFzaPwoopqjXD7zoanvD\n9CIBUB6H45NYlbLWq1Di23fY\n-----END PRIVATE KEY-----\n",
+    client_email:
+      "firebase-adminsdk-fbsvc@blogify-66da3.iam.gserviceaccount.com",
+    client_id: "107778643633842779259",
+    auth_uri: "https://accounts.google.com/o/oauth2/auth",
+    token_uri: "https://oauth2.googleapis.com/token",
+    auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+    client_x509_cert_url:
+      "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40blogify-66da3.iam.gserviceaccount.com",
+    universe_domain: "googleapis.com",
+  }),
+});
+
+const googleAuth = async (req, res) => {
+  try {
+    const { accessToken } = req.body;
+    let res = await getAuth().verifyIdToken(accessToken);
+    const { name, email } = res;
+    let user = await User.findOne({ email });
+    if (user) {
+      // REGISTERED
+      let token = await generateJWT({
+        email: user.email,
+        id: user._id,
+      });
+      return res.status(200).json({
+        message: "Logged in successfully",
+        success: true,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          token,
+        },
+      });
+    }
+
+    let newUser = await User.create({
+      name,
+      email,
+      googleAuth: true,
+    });
+
+    let token = await generateJWT({
+      email: newUser.email,
+      id: newUser._id,
+    });
+    return res.status(200).json({
+      message: "Registered successfully",
+      success: true,
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        token,
+      },
+    });
+
+    console.log(res);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Something went wrong",
+      success: false,
+    });
+  }
+};
 
 const createUser = async (req, res) => {
   const { name, email, password } = req.body;
@@ -234,7 +311,7 @@ const deleteUser = async (req, res) => {
   }
 };
 
-const verifyToken = async (req, res) => {
+const verifyEmail = async (req, res) => {
   try {
     const { token } = req.params;
     const verifyToken = await verifyJWT(token);
@@ -278,5 +355,6 @@ module.exports = {
   getSingleUser,
   updateUser,
   deleteUser,
-  verifyToken,
+  verifyEmail,
+  googleAuth,
 };

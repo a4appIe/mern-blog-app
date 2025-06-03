@@ -7,7 +7,8 @@ const {
   getSingleUser,
   updateUser,
   deleteUser,
-  verifyToken,
+  googleAuth,
+  verifyEmail,
 } = require("../controllers/userController");
 
 router.post("/signup", createUser);
@@ -22,6 +23,8 @@ router.patch("/users/:id", updateUser);
 
 router.delete("/users/:id", deleteUser);
 
-router.get("/verify-email/:token", verifyToken);
+router.get("/verify-email/:token", verifyEmail);
+
+router.post("/google-auth", googleAuth);
 
 module.exports = router;
